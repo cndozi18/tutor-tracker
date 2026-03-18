@@ -9,16 +9,26 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
+    "@schedule-x/calendar": "^4.3.1",
+    "@schedule-x/event-modal": "^4.3.1",
+    "@schedule-x/react": "^4.1.0",
+    "@schedule-x/scroll-controller": "^4.3.1",
+    "@schedule-x/theme-default": "^4.3.1",
+    "@supabase/ssr": "^0.9.0",
+    "@supabase/supabase-js": "^2.99.2",
+    "next": "14.2.35",
     "react": "^18",
     "react-dom": "^18",
-    "next": "14.2.35"
+    "react-hook-form": "^7.71.2",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
-    "typescript": "^5",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "postcss": "^8",
-    "tailwindcss": "^3.4.1"
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
   }
 }
