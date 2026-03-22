@@ -39,3 +39,8 @@ next-env.d.ts
 supabase/.temp
 
 /.claude
+
+reference_images/
+
+run.sh
+
