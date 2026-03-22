@@ -8,15 +8,17 @@ import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
 import { Select } from '@/components/ui/Select';
 import { Input } from '@/components/ui/Input';
+import type { Lesson } from '@/lib/types/database.types';
 
 interface QuickAddModalProps {
   open: boolean;
   onClose: () => void;
   defaultDate?: string;
   defaultTime?: string;
+  onCreated?: (lesson: Lesson) => void;
 }
 
-export function QuickAddModal({ open, onClose, defaultDate, defaultTime }: QuickAddModalProps) {
+export function QuickAddModal({ open, onClose, defaultDate, defaultTime, onCreated }: QuickAddModalProps) {
   const router = useRouter();
   const { createLesson } = useLessons();
   const { tutees } = useTutees();
@@ -45,6 +47,7 @@ export function QuickAddModal({ open, onClose, defaultDate, defaultTime }: Quick
         status: 'scheduled',
       });
       onClose();
+      onCreated?.(lesson);
       router.push(`/lessons/${lesson.id}/edit`);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to create lesson');
