@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
+    "@js-temporal/polyfill": "^0.5.1",
     "@schedule-x/calendar": "^4.3.1",
     "@schedule-x/event-modal": "^4.3.1",
     "@schedule-x/react": "^4.1.0",
