@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { Button } from '@/components/ui/Button';
+import { LessonActions } from '@/components/lessons/LessonActions';
 import type { Lesson } from '@/lib/types/database.types';
 
 type LessonWithTutee = Lesson & {
@@ -50,15 +51,30 @@ export default async function LessonDetailPage({ params }: Props) {
           <h1 className="font-serif text-2xl text-text leading-tight">{date}</h1>
           <p className="text-text-muted text-sm mt-0.5">{time} · {lesson.duration_mins} min</p>
         </div>
-        <Link href={`/lessons/${lesson.id}/edit`}>
-          <Button variant="secondary" size="sm">Edit</Button>
-        </Link>
+        <div className="flex items-center gap-2">
+          <LessonActions
+            lessonId={lesson.id}
+            seriesId={lesson.series_id}
+            startsAt={lesson.starts_at}
+            recurrenceRule={lesson.recurrence_rule}
+          />
+          <Link href={`/lessons/${lesson.id}/edit`}>
+            <Button variant="secondary" size="sm">Edit</Button>
+          </Link>
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-2 mb-6">
         <span className={`text-sm px-3 py-1 rounded-full font-medium ${status.color}`}>{status.label}</span>
         {lesson.subject && (
           <span className="text-sm px-3 py-1 rounded-full bg-accent/10 text-accent-dark font-medium">{lesson.subject}</span>
+        )}
+        {lesson.series_id && (
+          <Link href={`/lessons/series/${lesson.series_id}`}>
+            <span className="text-sm px-3 py-1 rounded-full bg-primary/10 text-primary font-medium cursor-pointer">
+              {lesson.recurrence_rule === 'weekly' ? 'Weekly' : 'Every 2 weeks'} series ↗
+            </span>
+          </Link>
         )}
       </div>
 

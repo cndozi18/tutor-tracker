@@ -3,7 +3,7 @@
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLessons } from '@/hooks/useLessons';
 import { useTutees } from '@/hooks/useTutees';
@@ -56,11 +56,41 @@ function toLocalDateTimeString(iso: string) {
   return { date, time };
 }
 
+function getMaxEndDate(): string {
+  const d = new Date();
+  d.setFullYear(d.getFullYear() + 1);
+  return d.toISOString().slice(0, 10);
+}
+
+function buildPreviewDates(startDate: string, startTime: string, rule: 'weekly' | 'biweekly'): string[] {
+  if (!startDate || !startTime) return [];
+  const intervalDays = rule === 'weekly' ? 7 : 14;
+  const dates: string[] = [];
+  let current = new Date(`${startDate}T${startTime}:00`);
+  for (let i = 0; i < 5; i++) {
+    dates.push(
+      current.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
+    );
+    current = new Date(current.getTime() + intervalDays * 24 * 60 * 60 * 1000);
+  }
+  return dates;
+}
+
 export function LessonForm({ lesson, mode, defaultTuteeId, defaultDate }: LessonFormProps) {
   const router = useRouter();
-  const { createLesson, updateLesson } = useLessons();
+  const { createLesson, createRecurringSeries, updateLesson, updateFutureLessons } = useLessons();
   const { tutees, loading: tuteesLoading } = useTutees();
   const [serverError, setServerError] = useState('');
+
+  // Recurrence state (create mode only)
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [recurrenceRule, setRecurrenceRule] = useState<'weekly' | 'biweekly'>('weekly');
+  const [endsType, setEndsType] = useState<'months3' | 'sessions' | 'date'>('months3');
+  const [endOccurrences, setEndOccurrences] = useState('');
+  const [endDate, setEndDate] = useState('');
+
+  // Edit mode: apply changes to future lessons in series
+  const [applyToFuture, setApplyToFuture] = useState(false);
 
   const defaultValues = lesson
     ? (() => {
@@ -95,7 +125,14 @@ export function LessonForm({ lesson, mode, defaultTuteeId, defaultDate }: Lesson
   });
 
   const selectedTuteeId = watch('tutee_id');
+  const watchedDate = watch('starts_at_date');
+  const watchedTime = watch('starts_at_time');
   const selectedTutee = tutees.find((t) => t.id === selectedTuteeId);
+
+  const previewDates = useMemo(
+    () => (isRecurring ? buildPreviewDates(watchedDate, watchedTime, recurrenceRule) : []),
+    [isRecurring, watchedDate, watchedTime, recurrenceRule]
+  );
 
   const onSubmit = async (values: LessonFormValues) => {
     setServerError('');
@@ -110,13 +147,37 @@ export function LessonForm({ lesson, mode, defaultTuteeId, defaultDate }: Lesson
         notes: values.notes || null,
         homework_set: values.homework_set || null,
         status: values.status,
+        series_id: null as string | null,
+        recurrence_rule: null as 'weekly' | 'biweekly' | null,
       };
 
       if (mode === 'create') {
-        const created = await createLesson(payload);
-        router.push(`/lessons/${created.id}`);
+        if (isRecurring) {
+          const recurrenceOptions: { rule: 'weekly' | 'biweekly'; endDate?: string; occurrences?: number } = {
+            rule: recurrenceRule,
+          };
+          if (endsType === 'sessions' && endOccurrences) {
+            recurrenceOptions.occurrences = parseInt(endOccurrences, 10);
+          } else if (endsType === 'date' && endDate) {
+            recurrenceOptions.endDate = endDate;
+          }
+          await createRecurringSeries(payload, recurrenceOptions);
+          router.push('/lessons');
+        } else {
+          const created = await createLesson(payload);
+          router.push(`/lessons/${created.id}`);
+        }
       } else if (lesson) {
         await updateLesson(lesson.id, payload);
+        if (applyToFuture && lesson.series_id) {
+          await updateFutureLessons(
+            lesson.series_id,
+            lesson.starts_at,
+            values.starts_at_time,
+            values.duration_mins,
+            values.subject || null
+          );
+        }
         router.push(`/lessons/${lesson.id}`);
       }
     } catch (err: unknown) {
@@ -202,6 +263,148 @@ export function LessonForm({ lesson, mode, defaultTuteeId, defaultDate }: Lesson
         </div>
       </div>
 
+      {/* Recurrence section — create mode only */}
+      {mode === 'create' && (
+        <div>
+          <h2 className="font-serif text-xl text-text-muted mb-0.5">Repeat</h2>
+          <div className="h-px bg-border mb-4" />
+
+          <label className="flex items-center gap-3 cursor-pointer mb-4">
+            <input
+              type="checkbox"
+              checked={isRecurring}
+              onChange={(e) => setIsRecurring(e.target.checked)}
+              className="w-4 h-4 rounded accent-primary"
+            />
+            <span className="text-sm text-text font-medium">Repeat this lesson</span>
+          </label>
+
+          {isRecurring && (
+            <div className="flex flex-col gap-4 pl-1">
+              {/* Frequency */}
+              <div>
+                <p className="text-sm font-medium text-text mb-2">Frequency</p>
+                <div className="flex gap-3">
+                  {(['weekly', 'biweekly'] as const).map((rule) => (
+                    <label key={rule} className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="recurrenceRule"
+                        value={rule}
+                        checked={recurrenceRule === rule}
+                        onChange={() => setRecurrenceRule(rule)}
+                        className="accent-primary"
+                      />
+                      <span className="text-sm text-text">
+                        {rule === 'weekly' ? 'Weekly' : 'Every 2 weeks'}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* End condition */}
+              <div>
+                <p className="text-sm font-medium text-text mb-2">Ends</p>
+                <div className="flex flex-col gap-2">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="endsType"
+                      checked={endsType === 'months3'}
+                      onChange={() => setEndsType('months3')}
+                      className="accent-primary"
+                    />
+                    <span className="text-sm text-text">After 3 months</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="endsType"
+                      checked={endsType === 'sessions'}
+                      onChange={() => setEndsType('sessions')}
+                      className="accent-primary"
+                    />
+                    <span className="text-sm text-text">After</span>
+                    <input
+                      type="number"
+                      min={1}
+                      max={52}
+                      value={endOccurrences}
+                      onChange={(e) => { setEndsType('sessions'); setEndOccurrences(e.target.value); }}
+                      placeholder="e.g. 10"
+                      className="w-20 h-8 px-2 text-sm rounded-lg border border-border bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                    <span className="text-sm text-text">sessions</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="endsType"
+                      checked={endsType === 'date'}
+                      onChange={() => setEndsType('date')}
+                      className="accent-primary"
+                    />
+                    <span className="text-sm text-text">On</span>
+                    <input
+                      type="date"
+                      value={endDate}
+                      max={getMaxEndDate()}
+                      onChange={(e) => { setEndsType('date'); setEndDate(e.target.value); }}
+                      className="h-8 px-2 text-sm rounded-lg border border-border bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                  </label>
+                </div>
+              </div>
+
+              {/* Preview dates */}
+              {previewDates.length > 0 && (
+                <div className="bg-background rounded-xl p-3">
+                  <p className="text-xs font-medium text-text-muted uppercase tracking-wide mb-2">
+                    First {previewDates.length} sessions
+                  </p>
+                  <ul className="flex flex-col gap-1">
+                    {previewDates.map((d, i) => (
+                      <li key={i} className="text-sm text-text flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+                        {d}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Apply to future — edit mode, recurring lessons only */}
+      {mode === 'edit' && lesson?.series_id && (
+        <div>
+          <h2 className="font-serif text-xl text-text-muted mb-0.5">Recurring series</h2>
+          <div className="h-px bg-border mb-4" />
+          <div className="bg-background rounded-xl p-3 mb-3">
+            <p className="text-xs text-text-muted">
+              This lesson repeats{' '}
+              {lesson.recurrence_rule === 'weekly' ? 'weekly' : 'every 2 weeks'}.
+            </p>
+          </div>
+          <label className="flex items-start gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={applyToFuture}
+              onChange={(e) => setApplyToFuture(e.target.checked)}
+              className="w-4 h-4 rounded accent-primary mt-0.5"
+            />
+            <span className="text-sm text-text">
+              Apply time and duration changes to all future lessons in this series
+            </span>
+          </label>
+        </div>
+      )}
+
       <div>
         <h2 className="font-serif text-xl text-text-muted mb-0.5">Session notes</h2>
         <div className="h-px bg-border mb-4" />
@@ -219,7 +422,11 @@ export function LessonForm({ lesson, mode, defaultTuteeId, defaultDate }: Lesson
           Cancel
         </Button>
         <Button type="submit" loading={isSubmitting} className="flex-1">
-          {mode === 'create' ? 'Schedule lesson' : 'Save changes'}
+          {mode === 'create'
+            ? isRecurring
+              ? 'Schedule series'
+              : 'Schedule lesson'
+            : 'Save changes'}
         </Button>
       </div>
     </form>

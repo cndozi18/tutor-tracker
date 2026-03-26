@@ -129,6 +129,8 @@ export type Database = {
           notes: string | null;
           homework_set: string | null;
           status: 'scheduled' | 'completed' | 'cancelled' | 'no_show';
+          series_id: string | null;
+          recurrence_rule: 'weekly' | 'biweekly' | null;
           created_at: string;
           updated_at: string;
         };
@@ -143,6 +145,8 @@ export type Database = {
           notes?: string | null;
           homework_set?: string | null;
           status?: 'scheduled' | 'completed' | 'cancelled' | 'no_show';
+          series_id?: string | null;
+          recurrence_rule?: 'weekly' | 'biweekly' | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -157,6 +161,8 @@ export type Database = {
           notes?: string | null;
           homework_set?: string | null;
           status?: 'scheduled' | 'completed' | 'cancelled' | 'no_show';
+          series_id?: string | null;
+          recurrence_rule?: 'weekly' | 'biweekly' | null;
           created_at?: string;
           updated_at?: string;
         };

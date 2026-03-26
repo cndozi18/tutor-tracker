@@ -58,7 +58,7 @@ export function useTutees() {
   const deleteTutee = async (id: string) => {
     const { error } = await supabase
       .from('tutees')
-      .update({ is_active: false })
+      .delete()
       .eq('id', id);
 
     if (error) throw error;

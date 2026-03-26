@@ -18,22 +18,20 @@ const g = globalThis as Record<string, unknown>;
 if (!g.Temporal) Object.assign(globalThis, { Temporal: TemporalPolyfill });
 const T = g.Temporal as TemporalType;
 
-const LOCAL_TZ = T.Now.timeZoneId();
-
-function toZonedDateTime(iso: string): TemporalPolyfill.ZonedDateTime {
-  return T.Instant.from(iso).toZonedDateTimeISO(LOCAL_TZ);
-}
-
-function getEndZonedDateTime(startsAt: string, durationMins: number): TemporalPolyfill.ZonedDateTime {
-  return toZonedDateTime(startsAt).add({ minutes: durationMins });
-}
-
+// Compute timezone inside the function, not at module level.
+// Module-level LOCAL_TZ would be evaluated on the server during SSR (returning UTC),
+// whereas CalendarInner only ever renders client-side (after useLessons loads).
+// Intl.DateTimeFormat().resolvedOptions().timeZone always returns the browser's
+// local timezone at call time, which is what we want.
 function lessonToEvent(lesson: Lesson) {
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const start = T.Instant.from(lesson.starts_at).toZonedDateTimeISO(tz);
+  const end = start.add({ minutes: lesson.duration_mins });
   return {
     id: lesson.id,
     title: lesson.subject ?? 'Lesson',
-    start: toZonedDateTime(lesson.starts_at),
-    end: getEndZonedDateTime(lesson.starts_at, lesson.duration_mins),
+    start,
+    end,
     calendarId: 'lessons',
   };
 }
@@ -114,7 +112,9 @@ function CalendarInner({ initialLessons, onEventClick, onClickDate, onClickDateT
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const $app = (calendarApp as any).$app;
-      const plainDate = T.PlainDate.from(newDate.toISOString().slice(0, 10));
+      const pad = (n: number) => String(n).padStart(2, '0');
+      const localDateStr = `${newDate.getFullYear()}-${pad(newDate.getMonth() + 1)}-${pad(newDate.getDate())}`;
+      const plainDate = T.PlainDate.from(localDateStr);
       $app.datePickerState.selectedDate.value = plainDate;
     } catch { /* ignore */ }
   };
