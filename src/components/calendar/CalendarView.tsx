@@ -85,8 +85,8 @@ function CalendarInner({ initialLessons, onEventClick, onClickDate, onClickDateT
     calendars: {
       lessons: {
         colorName: 'lessons',
-        lightColors: { main: '#1A6B5C', container: '#E8F5F2', onContainer: '#1A6B5C' },
-        darkColors:  { main: '#1A6B5C', container: '#E8F5F2', onContainer: '#1A6B5C' },
+        lightColors: { main: '#6B8F6D', container: '#E6EFE6', onContainer: '#6B8F6D' },
+        darkColors:  { main: '#6B8F6D', container: '#E6EFE6', onContainer: '#6B8F6D' },
       },
     },
     callbacks: {
@@ -138,10 +138,10 @@ function CalendarInner({ initialLessons, onEventClick, onClickDate, onClickDateT
         <span className="font-serif text-xl text-text">{monthLabel}</span>
         <div className="flex items-center gap-0.5">
           {/* View toggle */}
-          <div className="flex bg-border rounded-lg p-0.5 mr-2">
+          <div className="flex bg-border/60 rounded-full p-0.5 mr-2">
             <button
               onClick={() => handleViewChange('week')}
-              className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${
+              className={`px-3 py-1 text-[11px] font-semibold uppercase tracking-wider rounded-full transition-all ${
                 view === 'week'
                   ? 'bg-white text-primary shadow-card'
                   : 'text-text-muted hover:text-text'
@@ -151,7 +151,7 @@ function CalendarInner({ initialLessons, onEventClick, onClickDate, onClickDateT
             </button>
             <button
               onClick={() => handleViewChange('month')}
-              className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${
+              className={`px-3 py-1 text-[11px] font-semibold uppercase tracking-wider rounded-full transition-all ${
                 view === 'month'
                   ? 'bg-white text-primary shadow-card'
                   : 'text-text-muted hover:text-text'

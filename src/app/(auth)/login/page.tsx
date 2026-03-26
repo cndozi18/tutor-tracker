@@ -60,18 +60,18 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         {/* Logo / Brand */}
         <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary mb-4 shadow-card-lg">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary mb-4 shadow-card-lg">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
               <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
             </svg>
           </div>
           <h1 className="font-serif text-3xl text-text">Tutor Tracker</h1>
-          <p className="text-text-muted mt-1 text-sm">Your tutee management companion</p>
+          <p className="text-text-muted mt-1.5 text-sm tracking-wide">Your tutee management companion</p>
         </div>
 
         {/* Card */}
-        <div className="bg-surface rounded-2xl shadow-card-lg p-6">
+        <div className="card-base shadow-card-lg p-6">
           {step === 'email' ? (
             <form onSubmit={handleSendCode} className="flex flex-col gap-5">
               <div>

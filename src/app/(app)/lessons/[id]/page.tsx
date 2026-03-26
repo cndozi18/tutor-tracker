@@ -79,30 +79,30 @@ export default async function LessonDetailPage({ params }: Props) {
       </div>
 
       {tutee && (
-        <Link href={`/tutees/${lesson.tutee_id}`} className="block bg-surface rounded-2xl shadow-card p-4 mb-5">
-          <p className="text-xs text-text-muted uppercase tracking-wide font-medium mb-1">Tutee</p>
-          <p className="font-medium text-text">{tutee.full_name}</p>
+        <Link href={`/tutees/${lesson.tutee_id}`} className="block card-base border-l-3 border-l-primary p-4 mb-5 hover:shadow-card-hover transition-shadow">
+          <p className="section-label mb-1">Tutee</p>
+          <p className="font-semibold text-text">{tutee.full_name}</p>
           {tutee.year_group && <p className="text-sm text-text-muted">{tutee.year_group}</p>}
         </Link>
       )}
 
       {lesson.plan && (
-        <div className="bg-surface rounded-2xl shadow-card p-4 mb-4">
-          <p className="text-xs text-text-muted uppercase tracking-wide font-medium mb-2">Plan</p>
+        <div className="card-base p-4 mb-4">
+          <p className="section-label mb-2">Plan</p>
           <p className="text-sm text-text whitespace-pre-wrap">{lesson.plan}</p>
         </div>
       )}
 
       {lesson.notes && (
-        <div className="bg-surface rounded-2xl shadow-card p-4 mb-4">
-          <p className="text-xs text-text-muted uppercase tracking-wide font-medium mb-2">Notes</p>
+        <div className="card-base p-4 mb-4">
+          <p className="section-label mb-2">Notes</p>
           <p className="text-sm text-text whitespace-pre-wrap">{lesson.notes}</p>
         </div>
       )}
 
       {lesson.homework_set && (
-        <div className="bg-surface rounded-2xl shadow-card p-4 mb-4">
-          <p className="text-xs text-text-muted uppercase tracking-wide font-medium mb-2">Homework set</p>
+        <div className="card-base p-4 mb-4">
+          <p className="section-label mb-2">Homework set</p>
           <p className="text-sm text-text whitespace-pre-wrap">{lesson.homework_set}</p>
         </div>
       )}

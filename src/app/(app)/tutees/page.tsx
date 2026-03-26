@@ -17,12 +17,15 @@ export default function TuteesPage() {
 
   return (
     <div className="px-5 pt-8 pb-6 max-w-lg mx-auto">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-2">
         <h1 className="font-serif text-3xl text-text">Tutees</h1>
         <Link href="/tutees/new">
           <Button size="sm">+ New</Button>
         </Link>
       </div>
+      {!loading && tutees.length > 0 && (
+        <p className="text-sm text-text-muted mb-5">{tutees.length} tutee{tutees.length !== 1 ? 's' : ''}</p>
+      )}
 
       <div className="mb-5">
         <TuteeSearch onResults={setDisplayedTutees} initialTutees={tutees} />
@@ -33,7 +36,7 @@ export default function TuteesPage() {
       ) : effectiveTutees.length === 0 ? (
         <div className="text-center py-16">
           <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1A6B5C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#6B8F6D" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
               <circle cx="9" cy="7" r="4" />
               <line x1="19" y1="8" x2="19" y2="14" />

@@ -45,10 +45,7 @@ export function TopicProgressPanel({ tutee }: TopicProgressPanelProps) {
         return (
           <div key={subject}>
             {/* Section header */}
-            <div className="flex items-center gap-3 mb-3">
-              <h3 className="font-serif text-lg text-text">{subject}</h3>
-              <div className="flex-1 h-px bg-border" />
-            </div>
+            <h3 className="text-sm font-semibold text-text mb-3">{subject}</h3>
 
             {/* RAG chips */}
             <div className="flex flex-wrap gap-2 mb-3">

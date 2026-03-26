@@ -90,43 +90,48 @@ export default async function TuteeProfilePage({ params }: Props) {
 
       {/* Quick info */}
       {(tutee.parent_name || tutee.parent_phone || tutee.parent_email) && (
-        <div className="bg-surface rounded-2xl shadow-card p-4 mb-6">
-          <p className="text-xs text-text-muted uppercase tracking-wide font-medium mb-3">Parent / guardian</p>
-          {tutee.parent_name && <p className="text-sm text-text font-medium">{tutee.parent_name}</p>}
-          {tutee.parent_phone && (
-            <a href={`tel:${tutee.parent_phone}`} className="text-sm text-primary block mt-0.5">{tutee.parent_phone}</a>
-          )}
-          {tutee.parent_email && (
-            <a href={`mailto:${tutee.parent_email}`} className="text-sm text-primary block mt-0.5">{tutee.parent_email}</a>
-          )}
+        <div className="card-base p-4 mb-6">
+          <p className="section-label mb-3">Parent / guardian</p>
+          <div className="space-y-2">
+            {tutee.parent_name && (
+              <div className="flex items-center gap-2.5">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7C847E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+                <span className="text-sm text-text font-medium">{tutee.parent_name}</span>
+              </div>
+            )}
+            {tutee.parent_phone && (
+              <div className="flex items-center gap-2.5">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7C847E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" /></svg>
+                <a href={`tel:${tutee.parent_phone}`} className="text-sm text-primary">{tutee.parent_phone}</a>
+              </div>
+            )}
+            {tutee.parent_email && (
+              <div className="flex items-center gap-2.5">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7C847E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>
+                <a href={`mailto:${tutee.parent_email}`} className="text-sm text-primary">{tutee.parent_email}</a>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
       {/* Notes */}
       {tutee.notes && (
-        <div className="bg-surface rounded-2xl shadow-card p-4 mb-6">
-          <p className="text-xs text-text-muted uppercase tracking-wide font-medium mb-2">Notes</p>
+        <div className="card-base p-4 mb-6">
+          <p className="section-label mb-2">Notes</p>
           <p className="text-sm text-text whitespace-pre-wrap">{tutee.notes}</p>
         </div>
       )}
 
       {/* Topic progress */}
       <div className="mb-6">
-        <div className="flex items-center gap-3 mb-4">
-          <h2 className="font-serif text-xl text-text">Topic Progress</h2>
-          <div className="flex-1 h-px bg-border" />
-        </div>
+        <p className="section-label mb-3">Topic Progress</p>
         <TopicProgressPanel tutee={tutee} />
       </div>
 
       {/* Scheduled lessons */}
       <div className="mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3 flex-1">
-            <h2 className="font-serif text-xl text-text">Scheduled Lessons</h2>
-            <div className="flex-1 h-px bg-border" />
-          </div>
-        </div>
+        <p className="section-label mb-3">Scheduled Lessons</p>
         {hasScheduled ? (
           <div className="flex flex-col gap-3">
             {Object.entries(seriesGroups).map(([seriesId, lessons]) => (
@@ -148,10 +153,7 @@ export default async function TuteeProfilePage({ params }: Props) {
 
       {/* Past lessons */}
       <div className="mb-6">
-        <div className="flex items-center gap-3 mb-4">
-          <h2 className="font-serif text-xl text-text">Recent Lessons</h2>
-          <div className="flex-1 h-px bg-border" />
-        </div>
+        <p className="section-label mb-3">Recent Lessons</p>
         {pastLessons.length > 0 ? (
           <div className="flex flex-col gap-3">
             {pastLessons.map((lesson) => (

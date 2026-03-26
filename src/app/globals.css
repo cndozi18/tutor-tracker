@@ -5,10 +5,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap');
 
 :root {
-  --background: #FAF8F4;
-  --foreground: #1C1917;
-  --primary: #1A6B5C;
-  --accent: #E8863A;
+  --background: #F4F5F0;
+  --foreground: #2C332D;
+  --primary: #6B8F6D;
+  --accent: #C4916E;
 }
 
 * {
@@ -30,12 +30,25 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Dot grid texture */
+/* ── Reusable utility layers ───────────────────────────────────────────── */
+
+@layer components {
+  /* ALL CAPS section label — Stoic / Tiimo pattern */
+  .section-label {
+    @apply text-[11px] font-semibold uppercase tracking-label text-text-muted;
+  }
+
+  /* Standard card treatment */
+  .card-base {
+    @apply bg-surface rounded-card shadow-card;
+  }
+}
+
+/* Dot grid background texture */
 .dot-grid {
-  background-image: radial-gradient(circle, #1C1917 1px, transparent 1px);
+  background-image: radial-gradient(circle, #D5D8D1 0.6px, transparent 0.6px);
   background-size: 20px 20px;
-  background-position: 0 0;
-  opacity: 0.03;
+  opacity: 0.35;
 }
 
 /* Safe area utilities */
@@ -47,7 +60,8 @@ body {
   margin-bottom: calc(64px + env(safe-area-inset-bottom));
 }
 
-/* RAG chip animation */
+/* ── Animations ────────────────────────────────────────────────────────── */
+
 @keyframes rag-pulse {
   0% { transform: scale(1); }
   50% { transform: scale(1.08); }
@@ -58,85 +72,98 @@ body {
   animation: rag-pulse 0.2s ease-out;
 }
 
-/* Staggered list animation */
 @keyframes slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .animate-slide-up {
   animation: slide-up 0.3s ease-out forwards;
 }
 
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out forwards;
+}
+
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.animate-sheet-up {
+  animation: sheet-up 0.28s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+}
+
+@keyframes fab-pop {
+  0% { transform: scale(0.8); opacity: 0; }
+  60% { transform: scale(1.05); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.animate-fab-pop {
+  animation: fab-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
 /* ── Schedule-x calendar theming ─────────────────────────────────────────── */
 
-/* Design token overrides */
 .sx__calendar-wrapper {
-  --sx-color-primary: #1A6B5C !important;
+  --sx-color-primary: #6B8F6D !important;
   --sx-color-on-primary: #ffffff !important;
-  --sx-color-primary-container: #E8F5F2 !important;
-  --sx-color-on-primary-container: #1A6B5C !important;
-  --sx-color-surface: #FAF8F4 !important;
-  --sx-color-surface-container: #FAF8F4 !important;
-  --sx-color-surface-container-low: #FAF8F4 !important;
-  --sx-color-surface-container-high: #F0EDE8 !important;
-  --sx-color-background: #FAF8F4 !important;
-  --sx-color-on-surface: #1C1917 !important;
-  --sx-color-on-background: #1C1917 !important;
-  --sx-color-outline: #E7E5E0 !important;
-  --sx-color-outline-variant: #E7E5E0 !important;
-  --sx-color-neutral: #A8A29E !important;
-  --sx-color-neutral-variant: #A8A29E !important;
+  --sx-color-primary-container: #E6EFE6 !important;
+  --sx-color-on-primary-container: #567356 !important;
+  --sx-color-surface: #F4F5F0 !important;
+  --sx-color-surface-container: #F4F5F0 !important;
+  --sx-color-surface-container-low: #F4F5F0 !important;
+  --sx-color-surface-container-high: #EAECE6 !important;
+  --sx-color-background: #F4F5F0 !important;
+  --sx-color-on-surface: #2C332D !important;
+  --sx-color-on-background: #2C332D !important;
+  --sx-color-outline: #DDE1DA !important;
+  --sx-color-outline-variant: #DDE1DA !important;
+  --sx-color-neutral: #9CA39E !important;
+  --sx-color-neutral-variant: #9CA39E !important;
   font-family: 'DM Sans', system-ui, sans-serif !important;
   background: transparent !important;
 }
 
-/* Hide schedule-x's built-in navigation header — replaced by our custom header */
 .sx__calendar-header {
   display: none !important;
 }
 
-/* Hide schedule-x's week column date headers — replaced by our custom week strip */
 .sx-week-mode .sx__week-header,
 .sx-week-mode .sx__week-header-border {
   display: none !important;
 }
 
-/* ── Time axis ── */
 .sx__week-grid__hour-text {
   font-size: 0.65rem !important;
   font-family: 'DM Sans', system-ui, sans-serif !important;
-  color: #A8A29E !important;
+  color: #9CA39E !important;
   font-weight: 400 !important;
 }
 
-/* ── Week grid ── */
 .sx__week-grid {
   background: transparent !important;
 }
 
-/* ── Events (week view) ── */
 .sx__time-grid-event {
-  border-radius: 6px !important;
+  border-radius: 8px !important;
   border: none !important;
-  border-left: 3px solid #1A6B5C !important;
-  box-shadow: 0 1px 3px rgba(28, 25, 23, 0.08) !important;
-  padding: 3px 5px !important;
+  border-left: 3px solid #6B8F6D !important;
+  box-shadow: 0 1px 3px rgba(44, 51, 45, 0.06) !important;
+  padding: 3px 6px !important;
 }
 
-/* Compact layout: tighten gap between title and time badge */
 .sx__title-and-time-compact {
   gap: 3px !important;
   align-items: flex-start !important;
 }
 
-/* Clock icon: smaller and tighter */
 .sx__event-icon {
   min-width: 11px !important;
   min-height: 11px !important;
@@ -149,7 +176,7 @@ body {
   font-size: 0.75rem !important;
   font-weight: 600 !important;
   font-family: 'DM Sans', system-ui, sans-serif !important;
-  color: #1A6B5C !important;
+  color: #567356 !important;
   line-height: 1.2 !important;
   white-space: normal !important;
   overflow-wrap: break-word !important;
@@ -158,7 +185,6 @@ body {
   text-overflow: unset !important;
 }
 
-/* Compact layout (title + time on one line): allow wrapping instead of ellipsis */
 .sx__title-and-time-compact .sx__time-grid-event-title {
   white-space: normal !important;
   overflow: visible !important;
@@ -172,45 +198,42 @@ body {
 .sx__time-grid-event-time {
   font-size: 0.65rem !important;
   font-family: 'DM Sans', system-ui, sans-serif !important;
-  color: #1A6B5C !important;
+  color: #6B8F6D !important;
   opacity: 0.7 !important;
   flex-shrink: 0 !important;
 }
 
-/* ── Current time indicator ── */
 .sx__current-time-indicator {
-  background-color: #E8863A !important;
+  background-color: #C4916E !important;
   opacity: 0.9 !important;
 }
 
 .sx__current-time-indicator::before {
-  background-color: #E8863A !important;
+  background-color: #C4916E !important;
 }
 
-/* ── Month grid ── */
 .sx__month-grid-day__header-day-name {
   font-size: 0.6rem !important;
   font-weight: 600 !important;
   letter-spacing: 0.07em !important;
-  color: #A8A29E !important;
+  color: #9CA39E !important;
   text-transform: uppercase !important;
 }
 
 .sx__month-grid-day__header-date {
   font-family: 'DM Sans', system-ui, sans-serif !important;
   font-weight: 500 !important;
-  color: #1C1917 !important;
+  color: #2C332D !important;
 }
 
 .sx__month-grid-event {
-  border-radius: 3px !important;
+  border-radius: 4px !important;
   font-size: 0.65rem !important;
   font-weight: 500 !important;
   font-family: 'DM Sans', system-ui, sans-serif !important;
   padding: 1px 5px !important;
 }
 
-/* ── Month grid borders ── */
 .sx__month-grid-day {
-  border-color: #E7E5E0 !important;
+  border-color: #DDE1DA !important;
 }
